@@ -1,0 +1,7 @@
+interface:
+  display_name: "Commit QA Cases"
+  short_description: "Generate QA cases from commits or feature changes."
+  default_prompt: "Use $commit-qa-cases to analyze a commit, diff, or feature requirement, generate archived QA test cases, and optionally render an interactive HTML page."
+
+policy:
+  allow_implicit_invocation: false
