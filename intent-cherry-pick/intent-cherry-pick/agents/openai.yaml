@@ -1,0 +1,7 @@
+interface:
+  display_name: "Intent Cherry-Pick"
+  short_description: "Port commits with source-fidelity audits."
+  default_prompt: "Use $intent-cherry-pick to port a source commit to a target branch with source-fidelity, target protection, and an audit record."
+
+policy:
+  allow_implicit_invocation: true
