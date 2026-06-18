@@ -67,6 +67,20 @@ Use $commit-qa-cases to update the existing payment QA cases for commit c85a700 
 使用 $commit-qa-cases，基于 commit c85a700 生成 QA 测试用例，并归档到 docs/qa-case。
 ```
 
+## 使用示例
+
+输入提示示例：
+
+![commit-qa-cases 输入提示](../samples/commit-qa-cases/start_prompt.png)
+
+生成的交互式 HTML 测试页面：
+
+![commit-qa-cases 交互式 HTML](../samples/commit-qa-cases/finished_html.png)
+
+生成的归档资产：
+
+![commit-qa-cases 归档资产](../samples/commit-qa-cases/finished_assets.png)
+
 ## 工作流概览
 
 1. 用户提供 commit、range、diff、工作区改动、PR/分支对比、功能需求，或旧用例加新变更。
