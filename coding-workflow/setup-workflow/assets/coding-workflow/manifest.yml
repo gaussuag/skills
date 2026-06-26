@@ -1,0 +1,12 @@
+workflow_name: coding-workflow
+schema_version: 1
+setup_status: installed
+
+required_files:
+  - docs/coding-workflow/workflow.md
+  - docs/coding-workflow/rules.md
+  - docs/coding-workflow/templates.md
+  - docs/coding-workflow/manifest.yml
+
+required_directories:
+  - docs/coding-workflow/deliveries

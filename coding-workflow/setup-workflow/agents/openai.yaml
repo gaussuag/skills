@@ -1,0 +1,7 @@
+interface:
+  display_name: "Setup Workflow"
+  short_description: "Initialize coding workflow docs in a repo."
+  default_prompt: "Use $setup-workflow to initialize the coding workflow docs for this repository."
+
+policy:
+  allow_implicit_invocation: false

@@ -13,6 +13,14 @@
 
 ## 当前 Skills
 
+### coding-workflow
+
+[coding-workflow](coding-workflow/README.md) 是一组用于 PRD 驱动开发交付的 Codex skills，包含 `setup-workflow` 和 `implement-with-prd` 两个显式调用入口。
+
+它适合把需求讨论、PRD 沉淀和代码交付拆开管理：先用 `setup-workflow` 在目标仓库安装稳定的 `docs/coding-workflow/` 工作流协议，再用 `implement-with-prd` 基于明确 PRD 启动一次交付流程，生成 delivery 工作区和第一个 Build Worker prompt。
+
+安装说明见 [coding-workflow/INSTALL.md](coding-workflow/INSTALL.md)。
+
 ### commit-qa-cases
 
 [commit-qa-cases](commit-qa-cases/README.md) 用来根据 commit、diff、工作区改动或功能需求生成 QA 测试用例资产。
@@ -61,4 +69,12 @@ Use $commit-qa-cases to analyze the current working-tree changes and generate ar
 
 ```text
 使用 $intent-cherry-pick，把 pc_dev_feature 上的 f437cc373 合入 pc_main。
+```
+
+```text
+使用 $setup-workflow 初始化这个仓库的 coding workflow 文档。
+```
+
+```text
+使用 $implement-with-prd，基于 docs/prds/<prd-file>.md 启动 coding workflow。
 ```

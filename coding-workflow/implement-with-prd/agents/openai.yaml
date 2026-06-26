@@ -1,0 +1,7 @@
+interface:
+  display_name: "Implement With PRD"
+  short_description: "Start PRD-based delivery with coding workflow."
+  default_prompt: "Use $implement-with-prd with the provided PRD to start the coding workflow delivery."
+
+policy:
+  allow_implicit_invocation: false
