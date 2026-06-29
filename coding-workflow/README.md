@@ -39,11 +39,13 @@ docs/coding-workflow/deliveries/<delivery-id>/
   delivery-brief.md
   task-board.md
   current-task.md
-  worker-prompt.md
-  progress-log.md
-  decision-log.md
+  worker-reports/
+    .gitkeep
   reviews/
+    .gitkeep
 ```
+
+`current-task.md` 会包含可以直接复制给 Build Worker 的 prompt。`worker-reports/` 由 Build Worker 写事实交接，`reviews/` 由 Delivery Steward 写检查结论。`decision-log.md` 只在存在重要决策时创建，`final-handoff.md` 只在交付收口时创建。
 
 它不会直接实现业务代码。它会拆出第一个任务，并输出可以交给 Build Worker 的 prompt。
 
@@ -54,7 +56,7 @@ docs/coding-workflow/deliveries/<delivery-id>/
 - 要求 coding workflow 必须由人类显式启动。
 - 要求 `implement-with-prd` 必须拿到明确 PRD，不能凭空猜测要做什么。
 - 为每个进入交付的 PRD 创建独立 delivery 目录。
-- 维护交付过程中的任务、当前任务、进度、review、决策和 commit 证据。
+- 维护交付过程中的任务、当前任务、worker report、review、决策和 commit 证据。
 - 要求每轮产生文件变更的 Agent 提交自己的 git commit，并报告 commit hash。
 
 ## 它不会做什么
@@ -73,9 +75,9 @@ docs/coding-workflow/deliveries/<delivery-id>/
 2. 人类可以在任意对话中自由讨论需求。
 3. 如果讨论有价值，可以独立产出 PRD。
 4. 当人类决定基于某个 PRD 开始开发时，显式调用 `implement-with-prd`。
-5. `implement-with-prd` 检查 setup，读取 PRD，创建 delivery 工作区，生成第一个 Build Worker prompt。
-6. Build Worker 按 `current-task.md` 实现、测试、自测、提交 commit。
-7. Delivery Steward 检查交付结果。
+5. `implement-with-prd` 检查 setup，读取 PRD，创建 delivery 工作区，在 `current-task.md` 中生成第一个 Build Worker prompt。
+6. Build Worker 按 `current-task.md` 实现、测试、自测、写入 worker report、提交 commit。
+7. Delivery Steward 读取 worker report 和 commit，写入 review，更新任务状态。
 8. Human Approver 判断产品效果。
 9. 继续下一个任务、生成修正任务、暂停或结束。
 

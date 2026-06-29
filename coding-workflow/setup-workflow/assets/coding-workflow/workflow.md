@@ -56,8 +56,10 @@ PRD Writer 不会因为写好了 PRD 就自动启动开发流程。
 - 创建本次交付目录
 - 拆解开发任务
 - 维护任务状态
-- 生成当前任务
+- 生成当前任务和可复制给 Build Worker 的 prompt
 - 检查 Worker 的交付结果
+- 写入每轮 Steward review
+- 记录人类效果验收结论
 
 注意：
 
@@ -72,7 +74,8 @@ Delivery Steward 只检查“交付结果是否符合任务定义”，不检查
 - 编写或更新测试
 - 运行测试和自测
 - 提交本轮代码修改
-- 汇报结果、测试、commit hash 和风险
+- 写入 worker report
+- 汇报 worker report、测试、commit hash 和风险
 
 ### QA Verifier / 质量验证员，可选
 
@@ -133,18 +136,34 @@ docs/coding-workflow/deliveries/<delivery-id>/
 
 该目录记录本次开发交付的任务、状态、结果、review 和决策。
 
+典型目录结构：
+
+```text
+docs/coding-workflow/deliveries/<delivery-id>/
+  source-prd.md
+  delivery-brief.md
+  task-board.md
+  current-task.md
+  worker-reports/
+    .gitkeep
+  reviews/
+    .gitkeep
+```
+
+`decision-log.md` 只在存在重要决策时创建。`final-handoff.md` 只在 delivery 收口时创建。
+
 ### 6. 开发循环
 
 每轮循环如下：
 
 ```text
-Delivery Steward 生成 current-task
+Delivery Steward 生成 current-task 和 Build Worker prompt
         |
         v
-Build Worker 实现、测试、自测、commit
+Build Worker 实现、测试、自测、写 worker report、commit
         |
         v
-Delivery Steward 检查交付结果
+Delivery Steward 读取 worker report 并写 review
         |
         v
 Human Approver 检查产品效果
@@ -156,3 +175,11 @@ Human Approver 检查产品效果
 ### 7. 结束交付
 
 当 PRD 中定义的开发目标完成，并且人类确认效果可以接受时，本次 delivery 结束。
+
+结束时 Delivery Steward 应：
+
+- 确认 `task-board.md` 中任务状态已更新。
+- 确认每轮任务都有对应 worker report、review 和 commit hash。
+- 记录人类最终效果验收结论。
+- 创建 `final-handoff.md`，说明交付结论、主要入口、任务与 commit、验证摘要、已知限制和后续建议。
+- 如产生文档修改，提交只包含收口文档的 git commit。
