@@ -67,11 +67,18 @@ docs/coding-workflow/deliveries/<delivery-id>/
    - Do not add metadata, notes, or provenance headers to `source-prd.md`.
    - Automatic line-ending normalization by the platform is acceptable.
    - Record the original PRD path or `pasted content` source in `delivery-brief.md`.
-6. Write `delivery-brief.md` from the PRD with scope, non-scope, assumptions, risks, and implementation notes.
-7. Write `task-board.md` with an ordered task list. Keep tasks small enough for one Build Worker handoff.
-8. Create `worker-reports/.gitkeep` and `reviews/.gitkeep` so the startup commit preserves the delivery structure before any task report or review exists.
-9. Write `current-task.md` for the first task only. Include a `Build Worker Prompt` section that the human can copy directly to a Build Worker.
-10. Create `decision-log.md` only when there is a substantive startup decision to record. Otherwise, leave it absent until needed.
+6. Determine the delivery documentation language:
+   - If the human prompt explicitly asks for a documentation language, use that language.
+   - Otherwise, use the primary language of the PRD.
+   - If the PRD is mixed-language, use the human prompt language when clear; otherwise use the dominant PRD language.
+   - Use this language for generated delivery docs, including headings, descriptive text, task records, worker prompts, worker reports, reviews, decision logs, and final handoff.
+   - Keep `source-prd.md` verbatim; never translate it.
+   - Preserve product names, domain terms, APIs, code identifiers, file paths, commands, log lines, error text, quoted PRD text, and other professional terms in their original language when that is clearer.
+7. Write `delivery-brief.md` from the PRD with scope, non-scope, assumptions, risks, implementation notes, and the chosen delivery documentation language.
+8. Write `task-board.md` with an ordered task list. Keep tasks small enough for one Build Worker handoff.
+9. Create `worker-reports/.gitkeep` and `reviews/.gitkeep` so the startup commit preserves the delivery structure before any task report or review exists.
+10. Write `current-task.md` for the first task only. Include a `Build Worker Prompt` section that the human can copy directly to a Build Worker.
+11. Create `decision-log.md` only when there is a substantive startup decision to record. Otherwise, leave it absent until needed.
 
 ## Review Boundary
 

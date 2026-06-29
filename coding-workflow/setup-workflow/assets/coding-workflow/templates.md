@@ -11,6 +11,16 @@
 - `decision-log.md` 只在存在重要决策时创建或追加。
 - `final-handoff.md` 只在 delivery 收口时创建。
 
+语言规则：
+
+- 实例化这些模板时，先确定本次 delivery documentation language。
+- 如果人类 prompt 明确指定文档语言，使用该语言；否则使用 PRD 的主要语言。
+- 模板中的英文标题和字段名是语义示例，不是必须逐字保留的文案。
+- 生成文档中的标题、说明、任务记录、worker prompt、worker report、review、decision log 和 final handoff 应使用 delivery documentation language。
+- `source-prd.md` 是 raw copy，不翻译、不改写。
+- 产品名、领域术语、API、代码标识、文件路径、命令、日志行、错误文本、引用的 PRD 原文和 commit hash 保留原语言或原格式。
+- 专业术语使用原语言更清晰时可以保留原语言；组织性、描述性、记录性文本优先本地化。
+
 ## delivery-brief.md
 
 ```md
@@ -20,6 +30,8 @@
 
 - PRD source: <path-or-pasted-content>
 - Source snapshot: `source-prd.md` is a direct raw copy; do not rewrite or annotate it.
+- Delivery documentation language: <language inferred from prompt-or-prd>
+- Language note: <professional terms kept in original language when clearer>
 - Delivery id: <delivery-id>
 - Created at: <date>
 
@@ -96,6 +108,11 @@
 - Delivery brief: `delivery-brief.md`
 - Workflow rules: `../../workflow.md`, `../../rules.md`
 
+## Delivery Language
+
+- Use delivery documentation language from `delivery-brief.md`.
+- Keep professional terms, code identifiers, file paths, commands, logs, errors, quoted PRD text, and commit hashes in their original language or format when clearer.
+
 ## Implementation Requirements
 
 - <实现要求>
@@ -131,11 +148,12 @@
 完成后必须：
 
 1. 在 `docs/coding-workflow/deliveries/<delivery-id>/worker-reports/T001.md` 写任务报告。
-2. 运行相关测试，或说明无法运行的原因。
-3. 检查 `git status --short` 和必要的 `git diff`。
-4. 只 stage 当前任务相关文件，使用显式路径，不要使用 `git add .`。
-5. 创建只包含当前任务相关修改的 git commit，除非本轮没有文件修改。
-6. 回报 worker report 路径、测试结果、commit hash 和遗留风险。
+2. 任务报告的标题、说明和记录使用本次 delivery documentation language；专业术语、代码标识、文件路径、命令、日志和错误文本可保留原语言。
+3. 运行相关测试，或说明无法运行的原因。
+4. 检查 `git status --short` 和必要的 `git diff`。
+5. 只 stage 当前任务相关文件，使用显式路径，不要使用 `git add .`。
+6. 创建只包含当前任务相关修改的 git commit，除非本轮没有文件修改。
+7. 回报 worker report 路径、测试结果、commit hash 和遗留风险。
 ```
 
 ## worker-reports/<task-id>.md

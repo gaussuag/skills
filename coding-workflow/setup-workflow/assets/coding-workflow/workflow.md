@@ -136,6 +136,8 @@ docs/coding-workflow/deliveries/<delivery-id>/
 
 该目录记录本次开发交付的任务、状态、结果、review 和决策。
 
+除 `source-prd.md` 必须保持原始 PRD 内容外，本次 delivery 产生的交付文档应使用 PRD 或人类 prompt 所决定的本地化语言。专业术语、API、代码标识、命令、日志和错误文本可以保留原语言或原格式。
+
 典型目录结构：
 
 ```text

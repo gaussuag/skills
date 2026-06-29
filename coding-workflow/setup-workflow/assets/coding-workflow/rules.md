@@ -129,3 +129,15 @@ docs/coding-workflow/deliveries/<delivery-id>/
 7. `reviews/` 记录 Delivery Steward 的检查结论。
 8. `decision-log.md` 只记录重要决策；没有重要决策时可以不存在。
 9. `final-handoff.md` 只在 delivery 收口时创建。
+
+## 语言与本地化规则
+
+1. 每个 delivery 必须确定一个 delivery documentation language。
+2. 如果人类 prompt 明确指定文档语言，使用该语言。
+3. 如果人类 prompt 没有明确指定，使用 PRD 的主要语言。
+4. 如果 PRD 是多语言混合，优先使用人类 prompt 的语言；如果 prompt 也不明确，使用 PRD 中占主导的语言。
+5. 除 `source-prd.md` 外，生成的交付文档应使用 delivery documentation language，包括标题、说明、任务记录、worker prompt、worker report、review、decision log 和 final handoff。
+6. `source-prd.md` 必须保持原始内容，不翻译、不改写、不本地化。
+7. 产品名、领域术语、API、代码标识、文件路径、命令、日志行、错误文本、引用的 PRD 原文和 commit hash 应保留原语言或原格式。
+8. 专业术语使用原语言更清晰时，优先保留原语言；组织性、描述性、记录性的文本优先使用 delivery documentation language。
+9. 同一个 delivery 内的文档语言应保持一致；如果某个任务必须切换语言，应在对应 worker report 或 review 中说明原因。
