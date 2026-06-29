@@ -83,16 +83,18 @@ docs/coding-workflow/deliveries/<delivery-id>/
 12. 必须只 stage 当前任务相关文件，使用显式路径，不允许使用 `git add .`。
 13. 必须创建 git commit，除非本轮没有任何文件修改。
 14. commit 只能包含当前任务相关修改。
-15. 必须写入 `worker-reports/<task-id>.md`。
-16. 完成后必须报告：
+15. commit message 必须符合 Git 规则中的 Conventional Commits 约束。
+16. 必须写入 `worker-reports/<task-id>.md`。
+17. 完成后必须报告：
     - 本轮目标
     - 修改文件
     - 测试命令
     - 测试结果
     - worker report 路径
     - commit hash
+    - commit message
     - 遗留风险
-17. 截图和录屏不是默认必需证据；除非当前任务明确要求，否则日志、命令输出摘要和文字观察即可。
+18. 截图和录屏不是默认必需证据；除非当前任务明确要求，否则日志、命令输出摘要和文字观察即可。
 
 ## Human Approver 规则
 
@@ -110,13 +112,42 @@ docs/coding-workflow/deliveries/<delivery-id>/
 4. 提交前必须查看 `git status --short`。
 5. 提交前必须查看必要的 `git diff`。
 6. 必须使用显式路径 stage 文件，不允许使用 `git add .`。
-7. 不允许提交无关文件。
-8. 不允许提交临时文件、调试文件、缓存文件。
-9. 不允许把其他人或其他 Agent 的未提交修改纳入自己的 commit。
-10. 不允许擅自 revert、reset、checkout、rebase、amend。
-11. 需要这些操作时，必须得到人类明确许可。
-12. 每轮完成报告必须包含 commit hash。
-13. 没有 commit hash 的任务，不能视为完成，除非本轮没有文件修改且 worker report 明确说明。
+7. commit message 默认使用 Conventional Commits：
+
+```text
+<type>(<scope>): <summary>
+```
+
+8. 允许的 type：
+   - `feat`：新增功能或能力
+   - `fix`：修复缺陷
+   - `docs`：文档变更
+   - `test`：测试变更
+   - `refactor`：不改变行为的重构
+   - `perf`：性能优化
+   - `build`：构建系统或依赖
+   - `ci`：CI 配置
+   - `chore`：维护性杂项
+9. `scope` 应使用简短、稳定的模块名或交付域名，例如 `renderer`、`capture`、`coding-workflow`、`docs`。
+10. `summary` 应简短描述本次改动，优先使用 delivery documentation language；代码标识、API、产品名和专业术语可保留原语言。
+11. 任务 ID 不应作为 commit subject 的开头；任务追踪应记录在 `task-board.md`、worker report 和 review 中。
+12. 如需在 commit 中保留交付追踪信息，应写入 commit body，例如：
+
+```text
+Delivery: <delivery-id>
+Task: <task-id>
+Report: docs/coding-workflow/deliveries/<delivery-id>/worker-reports/<task-id>.md
+```
+
+13. workflow 文档类提交应使用 `docs(coding-workflow): <summary>`。
+14. 如果目标仓库已有明确且不同的 commit message 规范，优先遵守目标仓库规范，并在 worker report 或 review 中说明。
+15. 不允许提交无关文件。
+16. 不允许提交临时文件、调试文件、缓存文件。
+17. 不允许把其他人或其他 Agent 的未提交修改纳入自己的 commit。
+18. 不允许擅自 revert、reset、checkout、rebase、amend。
+19. 需要这些操作时，必须得到人类明确许可。
+20. 每轮完成报告必须包含 commit hash 和 commit message。
+21. 没有 commit hash 的任务，不能视为完成，除非本轮没有文件修改且 worker report 明确说明。
 
 ## 文档规则
 

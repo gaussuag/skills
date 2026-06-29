@@ -31,7 +31,7 @@ This skill is intentionally narrow. It creates or repairs workflow infrastructur
 
 If setup creates or repairs files, create a git commit for the setup changes.
 
-Use a concise commit message such as:
+Use a concise Conventional Commit message with the `docs(coding-workflow)` scope, such as:
 
 ```text
 docs(coding-workflow): initialize workflow docs

@@ -153,7 +153,9 @@
 4. 检查 `git status --short` 和必要的 `git diff`。
 5. 只 stage 当前任务相关文件，使用显式路径，不要使用 `git add .`。
 6. 创建只包含当前任务相关修改的 git commit，除非本轮没有文件修改。
-7. 回报 worker report 路径、测试结果、commit hash 和遗留风险。
+7. commit message 使用 Conventional Commits：`<type>(<scope>): <summary>`。
+8. 不要把 task id 放在 commit subject 开头；task id 写入 worker report，必要时写入 commit body。
+9. 回报 worker report 路径、测试结果、commit hash、commit message 和遗留风险。
 ```
 
 ## worker-reports/<task-id>.md
@@ -234,6 +236,16 @@
 - Post-commit `git status --short`:
 - Commit hash:
 - Commit message:
+- Commit message format:
+  - Expected: `<type>(<scope>): <summary>`
+  - Type used:
+  - Scope used:
+  - Summary language:
+  - Task id included in subject: Yes / No
+- Commit body delivery trace, if used:
+  - Delivery:
+  - Task:
+  - Report:
 - Uncommitted files, if any:
 - Reason for uncommitted files, if any:
 ```
@@ -260,6 +272,8 @@
 - Tests run or explained:
 - Worker report present:
 - Commit hash present:
+- Commit message follows Conventional Commits:
+- Commit subject avoids task id prefix:
 - Commit appears scoped to task:
 - Human product-effect review required:
 - Human product-effect review recorded:

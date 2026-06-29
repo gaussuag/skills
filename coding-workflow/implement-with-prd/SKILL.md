@@ -90,6 +90,7 @@ As Delivery Steward, review only delivery results:
 - Whether the worker report exists
 - Whether the git commit exists
 - Whether the commit hash was reported
+- Whether the commit message follows the workflow's Conventional Commits rules
 - Whether delivery docs were updated
 
 Do not judge product effect. Product effect review belongs to the human.
@@ -111,7 +112,7 @@ After creating the delivery startup docs:
 
 1. Inspect `git status` and `git diff`.
 2. Commit only the new delivery files.
-3. Use a concise commit message such as:
+3. Use a concise Conventional Commit message with the `docs(coding-workflow)` scope, such as:
 
 ```text
 docs(coding-workflow): start delivery <delivery-id>
