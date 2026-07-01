@@ -42,30 +42,79 @@ docs/coding-workflow/deliveries/<delivery-id>/
 1. 必须读取 PRD。
 2. 必须读取 `workflow.md`、`rules.md` 和 `templates.md`。
 3. 必须为本次交付创建和维护任务文档。
-4. 必须一次只给 Build Worker 一个当前任务。
-5. 必须维护 `task-board`。
-6. 必须维护 `current-task`。
-7. 必须在 `current-task` 中提供可复制给 Build Worker 的 prompt。
-8. 必须在每轮 Worker 完成后读取对应的 `worker-reports/<task-id>.md`。
-9. 必须在每轮检查后写入 `reviews/<task-id>-review.md`。
-10. 必须在每轮检查后更新 `task-board`；如果还有下一轮任务，更新 `current-task`；如果交付完成，进入 closeout。
-11. Delivery Steward 可以维护 delivery 文档，但不允许修改业务代码。
-12. 必须在每轮 Worker 完成后检查交付结果。
-13. 检查范围只包括：
+4. 每轮写入或替换 `current-task` 前，必须基于当轮上下文独立做 Route Decision。
+5. Route Decision 只能选择：
+   - `Direct Build`
+   - `Design First`
+   - `Spike / Investigation`
+6. 不允许使用 `Design Lite`。
+7. 不允许维护或引用 route-retrospective、route-fit feedback、历史偏好地图或其他历史路线经验来自动加速判断。
+8. Delivery Steward 可以判断是否需要 Design First，但不允许自己承担代码级设计；需要锁定代码级设计时，必须生成 Design Agent prompt。
+9. Route Decision 必须写入 `current-task`，包含推荐路线、当轮理由、是否需要人类确认和下一步 prompt 类型。
+10. 人类使用、拒绝或明确回复路线建议，才视为路线被确认；Steward 不得自行声称路线已获人类批准。
+11. 必须一次只给下一位 Agent 一个当前任务。
+12. 必须维护 `task-board`。
+13. 必须维护 `current-task`。
+14. 必须在 `current-task` 中提供一个可复制给下一位 Agent 的 route-specific prompt。
+15. 必须在每轮 Agent 完成后读取对应产物：
+   - Direct Build：`worker-reports/<task-id>.md`
+   - Design First：`designs/<task-id>-design.md`
+   - Spike / Investigation：`investigations/<task-id>-investigation.md`
+16. 必须在每轮检查后写入 `reviews/<task-id>-review.md`。
+17. 必须在每轮检查后更新 `task-board`；如果还有下一步，重新做 Route Decision 并更新 `current-task`；如果交付完成，进入 closeout。
+18. Delivery Steward 可以维护 delivery 文档，但不允许修改业务代码。
+19. 必须在每轮 Agent 完成后检查交付结果。
+20. 检查范围只包括：
    - 是否完成当前任务
    - 是否符合任务范围
    - 是否存在越界修改
    - 是否运行了必要测试
-   - 是否写入 worker report
+   - 如果本轮是 Direct Build，是否写入 worker report
+   - 如果本轮是 Design First，是否写入 design brief
+   - 如果本轮是 Spike / Investigation，是否写入 investigation report
    - 是否提交了 git commit
    - 是否报告了 commit hash
    - 是否更新了必要的交付文档
-14. Delivery Steward 不负责判断产品效果是否满意。
-15. Delivery Steward 不允许把自己的结果 review 说成人类效果验收。
-16. 如果 Worker 没有 worker report，本轮任务不能视为完成。
-17. 如果 Worker 没有 commit hash，本轮任务不能视为完成，除非本轮没有文件修改且 report 中说明原因。
-18. 如果发现问题，应生成修正任务，而不是直接扩大原任务范围。
-19. 当人类确认产品效果时，只记录人类结论和日期，不把它改写为 Steward 自己的验收。
+   - 如果实现任务引用 approved design，是否符合 design，或是否报告了偏离和原因
+21. Delivery Steward 不负责判断产品效果是否满意。
+22. Delivery Steward 不允许把自己的结果 review 说成人类效果验收。
+23. 如果 Direct Build 没有 worker report，本轮任务不能视为完成。
+24. 如果 Design First 没有 design brief，本轮任务不能视为完成。
+25. 如果 Spike / Investigation 没有 investigation report，本轮任务不能视为完成。
+26. 如果本轮有文件修改但没有 commit hash，本轮任务不能视为完成，除非 report 中说明没有提交的原因且人类接受。
+27. 如果发现问题，应生成修正任务或重新做 Route Decision，而不是直接扩大原任务范围。
+28. 当人类确认产品效果时，只记录人类结论和日期，不把它改写为 Steward 自己的验收。
+
+## Design Agent 规则
+
+1. 只在 `Design First` 路线中执行。
+2. 必须读取本轮 `current-task`、PRD snapshot、相关技术方案、相关 review/report 和当前代码事实。
+3. 只输出代码级 design brief，不修改应用代码。
+4. design brief 默认写入：
+
+```text
+docs/coding-workflow/deliveries/<delivery-id>/designs/<task-id>-design.md
+```
+
+5. design brief 必须覆盖目标行为、现状代码事实、拟修改文件、接口或签名变化、状态所有权、数据流、失败路径、生命周期/线程/资源释放语义、构建影响、测试策略、不做事项和需要人类决策的问题。
+6. 如果无法形成可信设计，必须说明阻塞和需要调查的问题，不得假装设计已完成。
+7. 如果写入文件，必须提交只包含设计产物的 commit，并报告 commit hash。
+8. Design Agent 不判断产品效果，也不宣布设计已被人类批准。
+
+## Investigation Agent 规则
+
+1. 只在 `Spike / Investigation` 路线中执行。
+2. 必须读取本轮 `current-task` 和任务指定的上下文。
+3. 只调查代码事实、构建事实、依赖行为、可行性或风险，不修改应用代码。
+4. investigation report 默认写入：
+
+```text
+docs/coding-workflow/deliveries/<delivery-id>/investigations/<task-id>-investigation.md
+```
+
+5. investigation report 必须区分已确认事实、推断、未验证点、风险和建议下一步。
+6. 如果写入文件，必须提交只包含调研产物的 commit，并报告 commit hash。
+7. Investigation Agent 不把建议自动升级为 approved design 或实现任务。
 
 ## Build Worker 规则
 
@@ -85,7 +134,9 @@ docs/coding-workflow/deliveries/<delivery-id>/
 14. commit 只能包含当前任务相关修改。
 15. commit message 必须符合 Git 规则中的 Conventional Commits 约束。
 16. 必须写入 `worker-reports/<task-id>.md`。
-17. 完成后必须报告：
+17. 如果本轮引用 approved design，必须按 design 实现，并在 worker report 中报告 design conformance。
+18. 如果 approved design 与当前代码事实冲突，或实现需要改变 design 中定义的接口、状态所有权、生命周期语义、构建/产物边界或错误语义，必须停止并报告；不得自行改成另一套设计继续实现。
+19. 完成后必须报告：
     - 本轮目标
     - 修改文件
     - 测试命令
@@ -94,7 +145,7 @@ docs/coding-workflow/deliveries/<delivery-id>/
     - commit hash
     - commit message
     - 遗留风险
-18. 截图和录屏不是默认必需证据；除非当前任务明确要求，否则日志、命令输出摘要和文字观察即可。
+20. 截图和录屏不是默认必需证据；除非当前任务明确要求，否则日志、命令输出摘要和文字观察即可。
 
 ## Human Approver 规则
 
@@ -158,8 +209,10 @@ Report: docs/coding-workflow/deliveries/<delivery-id>/worker-reports/<task-id>.m
 5. 不允许把多个 PRD 的交付状态混在同一个 delivery 目录里。
 6. `worker-reports/` 记录 Build Worker 的事实交接。
 7. `reviews/` 记录 Delivery Steward 的检查结论。
-8. `decision-log.md` 只记录重要决策；没有重要决策时可以不存在。
-9. `final-handoff.md` 只在 delivery 收口时创建。
+8. `designs/` 只在 Design First 路线中按需创建，记录 Design Agent 的设计产物。
+9. `investigations/` 只在 Spike / Investigation 路线中按需创建，记录 Investigation Agent 的调研产物。
+10. `decision-log.md` 只记录重要决策；没有重要决策时可以不存在。
+11. `final-handoff.md` 只在 delivery 收口时创建。
 
 ## 语言与本地化规则
 

@@ -8,6 +8,8 @@
 
 - 一个已经存在的 PRD 如何进入开发交付流程
 - Agent 如何拆解任务
+- Delivery Steward 如何判断下一步执行路线
+- Design Agent 如何在需要时先输出代码级设计
 - Worker 如何执行任务
 - Delivery Steward 如何检查交付结果
 - 人类如何做最终效果判断
@@ -56,14 +58,34 @@ PRD Writer 不会因为写好了 PRD 就自动启动开发流程。
 - 创建本次交付目录
 - 拆解开发任务
 - 维护任务状态
-- 生成当前任务和可复制给 Build Worker 的 prompt
+- 每轮独立判断下一步执行路线
+- 生成当前任务和可复制给下一位 Agent 的 prompt
 - 检查 Worker 的交付结果
 - 写入每轮 Steward review
 - 记录人类效果验收结论
 
 注意：
 
-Delivery Steward 只检查“交付结果是否符合任务定义”，不检查“产品效果是否令人满意”。
+Delivery Steward 只检查“交付结果是否符合任务定义”，不检查“产品效果是否令人满意”。Delivery Steward 可以判断本轮应该走 Direct Build、Design First 或 Spike / Investigation，但不承担代码级设计本身。
+
+### Design Agent / 设计工程师
+
+负责：
+
+- 在 Design First 路线中读取当前任务、PRD、技术方案和代码事实
+- 输出代码级 design brief
+- 明确接口、职责边界、状态所有权、数据流、失败路径、测试策略和不做事项
+- 不修改应用代码
+- 不把设计确认伪装成人类批准
+
+### Investigation Agent / 调研工程师
+
+负责：
+
+- 在 Spike / Investigation 路线中调查代码事实、构建事实、依赖行为或可行性
+- 输出 investigation report
+- 不修改应用代码
+- 不把调研建议直接当作已批准设计或实现任务
 
 ### Build Worker / 实现工程师
 
@@ -150,6 +172,8 @@ docs/coding-workflow/deliveries/<delivery-id>/
     .gitkeep
   reviews/
     .gitkeep
+  designs/           # optional, only when Design First is used
+  investigations/    # optional, only when Spike / Investigation is used
 ```
 
 `decision-log.md` 只在存在重要决策时创建。`final-handoff.md` 只在 delivery 收口时创建。
@@ -159,13 +183,40 @@ docs/coding-workflow/deliveries/<delivery-id>/
 每轮循环如下：
 
 ```text
-Delivery Steward 生成 current-task 和 Build Worker prompt
+Delivery Steward 读取当前上下文
         |
         v
-Build Worker 实现、测试、自测、写 worker report、commit
+Delivery Steward 输出 Route Decision
         |
         v
-Delivery Steward 读取 worker report 并写 review
+Human 确认或使用下一步 prompt
+        |
+        +--> Direct Build
+        |       |
+        |       v
+        |    Build Worker 实现、测试、自测、写 worker report、commit
+        |
+        +--> Design First
+        |       |
+        |       v
+        |    Design Agent 输出 design brief，不改应用代码
+        |       |
+        |       v
+        |    Human / Delivery Steward 确认 design
+        |       |
+        |       v
+        |    Build Worker 按 approved design 实现
+        |
+        +--> Spike / Investigation
+                |
+                v
+             Investigation Agent 输出 investigation report，不改应用代码
+                |
+                v
+             Delivery Steward 重新判断路线
+        |
+        v
+Delivery Steward 读取对应产物并写 review
         |
         v
 Human Approver 检查产品效果

@@ -41,13 +41,15 @@ docs/coding-workflow/deliveries/<delivery-id>/
   current-task.md
   worker-reports/
     .gitkeep
+  designs/          # 按需创建
+  investigations/   # 按需创建
   reviews/
     .gitkeep
 ```
 
-`current-task.md` 会包含可以直接复制给 Build Worker 的 prompt。`worker-reports/` 由 Build Worker 写事实交接，`reviews/` 由 Delivery Steward 写检查结论。`decision-log.md` 只在存在重要决策时创建，`final-handoff.md` 只在交付收口时创建。
+`current-task.md` 会包含 Route Decision 和可以直接复制给下一位 Agent 的 prompt。下一步可能是 Build Worker、Design Agent 或 Investigation Agent。`worker-reports/` 由 Build Worker 写事实交接，`designs/` 由 Design Agent 按需写代码级设计，`investigations/` 由 Investigation Agent 按需写调研报告，`reviews/` 由 Delivery Steward 写检查结论。`decision-log.md` 只在存在重要决策时创建，`final-handoff.md` 只在交付收口时创建。
 
-它不会直接实现业务代码。它会拆出第一个任务，并输出可以交给 Build Worker 的 prompt。
+它不会直接实现业务代码。它会拆出第一个任务，先判断下一步路线，再输出对应 prompt。
 
 ## 它会做什么
 
@@ -57,6 +59,7 @@ docs/coding-workflow/deliveries/<delivery-id>/
 - 要求 `implement-with-prd` 必须拿到明确 PRD，不能凭空猜测要做什么。
 - 为每个进入交付的 PRD 创建独立 delivery 目录。
 - 维护交付过程中的任务、当前任务、worker report、review、决策和 commit 证据。
+- 每轮由 Delivery Steward 基于当轮上下文独立判断下一步走 Direct Build、Design First 或 Spike / Investigation，并由人类确认或使用对应 prompt。
 - 要求每轮产生文件变更的 Agent 提交自己的 git commit，并报告 commit hash。
 
 ## 它不会做什么
@@ -67,6 +70,8 @@ docs/coding-workflow/deliveries/<delivery-id>/
 - 不会替人类判断产品效果是否满意。
 - 不会在 `setup-workflow` 阶段修改业务代码。
 - 不会在 `implement-with-prd` 阶段直接实现业务代码。
+- 不会让 Delivery Steward 充当代码级设计者；需要代码级设计时，会输出 Design Agent prompt。
+- 不会维护 route-retrospective、Route Fit Feedback 或用历史路线经验自动决定下一步路线。
 - 不会把 Delivery Steward 的结果 review 伪装成人类效果验收。
 
 ## 典型使用顺序
@@ -75,9 +80,12 @@ docs/coding-workflow/deliveries/<delivery-id>/
 2. 人类可以在任意对话中自由讨论需求。
 3. 如果讨论有价值，可以独立产出 PRD。
 4. 当人类决定基于某个 PRD 开始开发时，显式调用 `implement-with-prd`。
-5. `implement-with-prd` 检查 setup，读取 PRD，创建 delivery 工作区，在 `current-task.md` 中生成第一个 Build Worker prompt。
-6. Build Worker 按 `current-task.md` 实现、测试、自测、写入 worker report、提交 commit。
-7. Delivery Steward 读取 worker report 和 commit，写入 review，更新任务状态。
+5. `implement-with-prd` 检查 setup，读取 PRD，创建 delivery 工作区，在 `current-task.md` 中写入 Route Decision 和第一个 route-specific prompt。
+6. 人类确认或使用 prompt 后，下一位 Agent 执行对应路线：
+   - Direct Build：Build Worker 实现、测试、自测、写入 worker report、提交 commit。
+   - Design First：Design Agent 输出 design brief，不改应用代码；设计确认后再生成 Build Worker prompt。
+   - Spike / Investigation：Investigation Agent 输出 investigation report，不改应用代码；Steward 根据事实重新判断路线。
+7. Delivery Steward 读取对应产物和 commit，写入 review，更新任务状态。
 8. Human Approver 判断产品效果。
 9. 继续下一个任务、生成修正任务、暂停或结束。
 
@@ -125,7 +133,9 @@ PRD 是 coding workflow 的输入，不是启动信号。
 
 - Human Approver：决定 PRD 是否进入交付，判断产品效果。
 - PRD Writer：在 workflow 外讨论需求并产出 PRD。
-- Delivery Steward：由 `implement-with-prd` 承担，负责拆任务和检查交付结果。
+- Delivery Steward：由 `implement-with-prd` 承担，负责拆任务、判断下一步路线和检查交付结果。
+- Design Agent：在 Design First 路线中输出代码级 design brief，不修改应用代码。
+- Investigation Agent：在 Spike / Investigation 路线中调查代码事实或可行性，不修改应用代码。
 - Build Worker：执行 `current-task.md`，开发、测试、自测并提交 commit。
 - QA Verifier：可选角色，未来可独立承担更系统的质量验证。
 

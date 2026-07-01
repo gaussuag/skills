@@ -138,5 +138,5 @@ Use $implement-with-prd with docs/prds/<prd-file>.md to start the coding workflo
 - 不要安装外层 `skills/coding-workflow/` 目录。
 - 需要分别安装 `setup-workflow` 和 `implement-with-prd` 两个目录。
 - 不要期待 `setup-workflow` 讨论需求、写 PRD、拆任务或修改业务代码。
-- 不要期待 `implement-with-prd` 直接实现业务代码；它是 Delivery Steward，会生成交给 Build Worker 的任务 prompt。
+- 不要期待 `implement-with-prd` 直接实现业务代码；它是 Delivery Steward，会先判断下一步路线，并生成交给 Build Worker、Design Agent 或 Investigation Agent 的 route-specific prompt。
 - PRD 创建完成不代表自动进入 coding workflow，必须由人类明确启动。

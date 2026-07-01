@@ -7,7 +7,7 @@ description: Explicitly-invoked Delivery Steward workflow for starting implement
 
 Act as the Delivery Steward for a provided PRD and start one coding-workflow delivery.
 
-This skill does not implement application code. It reads a PRD, verifies that `setup-workflow` has already installed the workflow docs, creates a delivery workspace, plans the first task, and outputs the Build Worker prompt embedded in `current-task.md`.
+This skill does not implement application code. It reads a PRD, verifies that `setup-workflow` has already installed the workflow docs, creates a delivery workspace, plans the first task, makes a route decision for the next step, and outputs the next route-specific prompt embedded in `current-task.md`.
 
 ## Hard Entry Rules
 
@@ -75,10 +75,44 @@ docs/coding-workflow/deliveries/<delivery-id>/
    - Keep `source-prd.md` verbatim; never translate it.
    - Preserve product names, domain terms, APIs, code identifiers, file paths, commands, log lines, error text, quoted PRD text, and other professional terms in their original language when that is clearer.
 7. Write `delivery-brief.md` from the PRD with scope, non-scope, assumptions, risks, implementation notes, and the chosen delivery documentation language.
-8. Write `task-board.md` with an ordered task list. Keep tasks small enough for one Build Worker handoff.
+8. Write `task-board.md` with an ordered task list. Keep tasks small enough for one Agent handoff.
 9. Create `worker-reports/.gitkeep` and `reviews/.gitkeep` so the startup commit preserves the delivery structure before any task report or review exists.
-10. Write `current-task.md` for the first task only. Include a `Build Worker Prompt` section that the human can copy directly to a Build Worker.
+10. Write `current-task.md` for the first step only. Include a `Route Decision` section and exactly one route-specific prompt section that the human can copy to the next agent:
+   - `Build Worker Prompt` for Direct Build.
+   - `Design Agent Prompt` for Design First.
+   - `Investigation Prompt` for Spike / Investigation.
 11. Create `decision-log.md` only when there is a substantive startup decision to record. Otherwise, leave it absent until needed.
+
+## Route Decision
+
+Before writing or replacing `current-task.md`, independently analyze the current delivery context and recommend one route for the next step:
+
+- `Direct Build`: create a Build Worker task. Use when the task can be implemented safely from the PRD, technical plan, current code, and task boundaries without a separate code-level design.
+- `Design First`: create a Design Agent task. Use when the next step needs code-level design to lock interfaces, ownership, lifecycle, build/package layout, platform boundaries, or other implementation shape before coding. The Design Agent writes a design brief and must not edit application code.
+- `Spike / Investigation`: create an Investigation task. Use when code facts, feasibility, dependency behavior, build behavior, or risk are unclear enough that implementation or design would be premature. The agent writes an investigation report and must not edit application code.
+
+Rules for route decisions:
+
+1. Base each route decision only on the current context: PRD, technical plan, delivery docs, current code facts, worker reports, reviews, and explicit human input.
+2. Do not maintain or consult route retrospectives, route-fit feedback, historical preference maps, or automatic history-based shortcuts.
+3. Do not use a `Design Lite` route.
+4. Do not let Delivery Steward write code-level design constraints as a substitute for a Design Agent. If code-level design needs to be locked before implementation, choose `Design First`.
+5. Write the route recommendation, reasons, and whether human confirmation is needed into `current-task.md`.
+6. Treat the human's use or rejection of the emitted prompt as the route confirmation. Do not claim the route is approved unless the human explicitly says so.
+
+For `Design First`, the design brief should be written under:
+
+```text
+docs/coding-workflow/deliveries/<delivery-id>/designs/<task-id>-design.md
+```
+
+For `Spike / Investigation`, the investigation report should be written under:
+
+```text
+docs/coding-workflow/deliveries/<delivery-id>/investigations/<task-id>-investigation.md
+```
+
+Create `designs/` or `investigations/` only when that route is selected.
 
 ## Review Boundary
 
@@ -92,6 +126,7 @@ As Delivery Steward, review only delivery results:
 - Whether the commit hash was reported
 - Whether the commit message follows the workflow's Conventional Commits rules
 - Whether delivery docs were updated
+- If an approved design exists for the implementation task, whether the implementation conforms to that design or reports justified deviations
 
 Do not judge product effect. Product effect review belongs to the human.
 
@@ -101,10 +136,23 @@ When the human reports that a Build Worker completed a task:
 2. Inspect the changed files and delivery docs as needed.
 3. Write `reviews/<task-id>-review.md`.
 4. Update `task-board.md`.
-5. If the task passed and more PRD scope remains, replace `current-task.md` with the next task and include its `Build Worker Prompt`.
+5. If the task passed and more PRD scope remains, make a fresh route decision for the next step, replace `current-task.md`, and include exactly one route-specific prompt.
 6. If the task passed and the delivery is complete, create `final-handoff.md` and do not invent another task.
 7. If the task needs fixes, write a focused correction task instead of expanding the original task.
 8. If the human has provided product-effect approval, record it as the human's conclusion, not as Steward review.
+
+When the human reports that a Design Agent completed a design task:
+
+1. Read `current-task.md`, the design brief, and the reported commit.
+2. Review only whether the design task was completed, stayed in scope, and produced a usable design brief. Do not silently convert Steward into the designer.
+3. If the human approves the design and implementation should proceed, replace `current-task.md` with a Build Worker task that references the approved design.
+4. The Build Worker prompt must require the worker to follow the approved design, report any deviations, and stop before changing design direction if the design conflicts with current code facts.
+
+When the human reports that an Investigation Agent completed a spike:
+
+1. Read `current-task.md`, the investigation report, and the reported commit if files changed.
+2. Write a review of the investigation result.
+3. Make a fresh route decision from the newly discovered facts. Do not automatically continue with the same route.
 
 ## Git Requirement
 
@@ -128,5 +176,6 @@ End by giving the human:
 
 - Delivery directory path
 - Startup commit hash
-- First Build Worker prompt from the `Build Worker Prompt` section of `current-task.md`
-- Any assumptions or risks that the Build Worker must know
+- Route decision for the first step
+- First route-specific prompt from `current-task.md`
+- Any assumptions or risks that the next agent must know

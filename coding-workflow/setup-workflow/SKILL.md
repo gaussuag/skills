@@ -55,4 +55,4 @@ Concrete PRD delivery state belongs under:
 docs/coding-workflow/deliveries/<delivery-id>/
 ```
 
-The installed templates define per-delivery files such as `current-task.md`, `worker-reports/`, `reviews/`, optional `decision-log.md`, and closeout `final-handoff.md`. But this skill must not create those concrete delivery files or directories except for the empty parent `deliveries/` folder and `.gitkeep`.
+The installed templates define per-delivery files such as `current-task.md`, `worker-reports/`, optional `designs/`, optional `investigations/`, `reviews/`, optional `decision-log.md`, and closeout `final-handoff.md`. But this skill must not create those concrete delivery files or directories except for the empty parent `deliveries/` folder and `.gitkeep`.
